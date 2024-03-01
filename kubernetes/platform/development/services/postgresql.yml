@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudnative-postgres
+  labels:
+    db: cloudnative-postgres
+spec:
+  selector:
+    matchLabels:
+      db: cloudnative-postgres
+  template:
+    metadata:
+      labels:
+        db: cloudnative-postgres
+    spec:
+      containers:
+        - name: cloudnative-postgres
+          image: postgres:14.10
+          env:
+            - name: POSTGRES_USER
+              value: user
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: cloudnativedb_catalog
+          resources:
+            requests:
+              cpu: 100m
+              memory: 60Mi
+            limits:
+              cpu: 200m
+              memory: 120Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudnative-postgres
+  labels:
+    db: cloudnative-postgres
+spec:
+  type: ClusterIP
+  selector:
+    db: cloudnative-postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
